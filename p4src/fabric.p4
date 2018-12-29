@@ -105,6 +105,9 @@ action switch_fabric_multicast_packet() {
 table fabric_ingress_dst_lkp {
     reads {
         fabric_header.dstDevice : exact;
+	fabric_header_unicast : valid;
+	fabric_header_multicast: valid;
+	fabric_header_cpu : valid;
     }
     actions {
         nop;
@@ -185,7 +188,9 @@ table native_packet_over_fabric {
 /*****************************************************************************/
 control process_ingress_fabric {
     if (ingress_metadata.port_type != PORT_TYPE_NORMAL) {
-        apply(fabric_ingress_dst_lkp);
+        if (valid(fabric_header) and valid(fabric_payload_header)) { 
+            apply(fabric_ingress_dst_lkp);
+	}
 #ifdef FABRIC_ENABLE
         if (ingress_metadata.port_type == PORT_TYPE_FABRIC) {
             if (valid(fabric_header_multicast)) {

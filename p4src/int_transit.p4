@@ -508,6 +508,8 @@ table int_sink_update_outer {
     // miss => nop
     reads {
         vxlan_gpe_int_header        : valid;
+	vxlan_gpe                   : valid; // valid(vxlan_gpe_int_header) => valid(vxlan_gpe)
+	udp                         : valid; // valid(vxlan_gpe_int_header) => valid(udp)
         ipv4                        : valid;
         int_metadata_i2e.sink       : exact;
     }
@@ -662,7 +664,9 @@ table int_outer_encap {
     //      miss => nop
     reads {
         ipv4                                : valid;
+	udp                                 : valid;
         vxlan_gpe                           : valid;
+	vxlan_gpe_int_header                : valid;
         int_metadata_i2e.source             : exact;
         tunnel_metadata.egress_tunnel_type  : ternary;
     }

@@ -294,6 +294,7 @@ table tunnel {
         tunnel_metadata.ingress_tunnel_type : exact;
         inner_ipv4 : valid;
         inner_ipv6 : valid;
+	inner_ethernet: valid;
     }
     actions {
         nop;
@@ -1292,6 +1293,9 @@ table tunnel_encap_process_outer {
         tunnel_metadata.egress_tunnel_type : exact;
         tunnel_metadata.egress_header_count : exact;
         multicast_metadata.replica : exact;
+	ipv4 : valid;
+	ipv6 : valid;
+	gre  : valid; 
     }
     actions {
         nop;
@@ -1389,6 +1393,13 @@ action set_mpls_rewrite_push3(label1, exp1, ttl1, label2, exp2, ttl2,
 table tunnel_rewrite {
     reads {
         tunnel_metadata.tunnel_index : exact;
+	fabric_header_unicast : valid;
+	fabric_header_multicast : valid;
+	// these should be implied by the value of tunnel_metadata.tunnel_index
+	mpls[0] : valid;
+	mpls[1] : valid;
+	mpls[2] : valid;
+
     }
     actions {
         nop;
@@ -1452,6 +1463,8 @@ action rewrite_tunnel_ipv6_src(ip) {
 table tunnel_src_rewrite {
     reads {
         tunnel_metadata.tunnel_src_index : exact;
+	ipv4 : valid;
+	ipv6 : valid;
     }
     actions {
         nop;
@@ -1480,6 +1493,8 @@ action rewrite_tunnel_ipv6_dst(ip) {
 table tunnel_dst_rewrite {
     reads {
         tunnel_metadata.tunnel_dst_index : exact;
+	ipv4 : valid;
+	ipv6 : valid;
     }
     actions {
         nop;

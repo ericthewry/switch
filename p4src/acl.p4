@@ -367,16 +367,33 @@ table ipv6_acl {
 /*****************************************************************************/
 /* ACL Control flow                                                          */
 /*****************************************************************************/
+
+action dropact(){
+       drop();
+}
+
+table drop_tbl {
+      actions { dropact; }
+}
+
 control process_ip_acl {
     if (DO_LOOKUP(ACL)) {
         if (l3_metadata.lkp_ip_type == IPTYPE_IPV4) {
 #ifndef IPV4_DISABLE
-            apply(ip_acl);
+            if (valid(tcp)) {
+                apply(ip_acl);
+            } else {
+	        apply(drop_tbl);
+	    }
 #endif /* IPV4_DISABLE */
         } else {
             if (l3_metadata.lkp_ip_type == IPTYPE_IPV6) {
 #ifndef IPV6_DISABLE
-                apply(ipv6_acl);
+                if (valid(tcp)) {
+                    apply(ipv6_acl);
+		} else {
+		    apply(drop_tbl);
+		}
 #endif /* IPV6_DISABLE */
             }
         }
